@@ -1,0 +1,33 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "[![Actions Status](https://github.com/Langstone/backend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/Langstone/backend-project-lvl3/actions)",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "bin": {
+    "page-loader": "./page_loader.js"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Langstone/backend-project-lvl3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Langstone/backend-project-lvl3/issues"
+  },
+  "homepage": "https://github.com/Langstone/backend-project-lvl3#readme",
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.16.0",
+    "eslint": "^8.1.0",
+    "jest": "^27.3.1",
+    "nock": "^13.2.0"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "commander": "^8.3.0"
+  }
+}
