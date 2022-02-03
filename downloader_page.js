@@ -9,21 +9,23 @@ function renameFile(element) {
   return element;
 };
 
+
 const downloaderPage = ((htmlPath, currentDir = dirname) => {
-  return axios({
-    method: 'get',
-    url: htmlPath,
-  })
-    .then(response => {
+  return new Promise(resolve => {
+    axios({
+      method: 'get',
+      url: htmlPath,
+    })
+    .then(async response => {
       const nameForFileWithoutProtocol = htmlPath.slice(8).split('');
       const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
       const pathToFile = currentDir.concat( "/" + nameForNewFile);
-      writeFile(pathToFile, response.data);
-      console.log(pathToFile);
+      await writeFile(pathToFile, response.data);
+      resolve(pathToFile);
     })
-    .catch((error => {
+    .catch(() => {
       console.log('перейти по указанной странице не получилось');
-    }))
+    });
+  })
 });
-
 export default downloaderPage;
