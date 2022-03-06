@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import axios from 'axios';
 import { URL } from 'url';
+import debug from 'debug';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -11,12 +12,16 @@ function changeElement(element) {
   return element;
 };
 
+const logPageLoader = debug('page-loader');
+
 const createDirectory = (filepath) => {
   return new Promise(resolve => {
+    logPageLoader(`Создаем директорию для загрузки файлов`);
     const dirrectory = path.parse(filepath).dir;
     const nameForDirrectory = path.parse(filepath).name.concat('_files');
     const nameForDir = `${dirrectory}/${nameForDirrectory}`;
     fs.mkdir(nameForDir);
+    logPageLoader(`Директория для загрузки файлов создана ${nameForDir}`);
     resolve(nameForDir);
   });
 };
@@ -35,7 +40,8 @@ const filtredImageList = (filepath) => {
         }).filter(el => el !== undefined);
         resolve(filtredImageList);
       })
-      .catch(err => console.log(err));  
+      .catch(err => {
+        console.log(err)});  
   })
 };
 
@@ -45,6 +51,7 @@ const writeFile = (nameForDir, list, url) => {
   const hostUrl = myURL.host;
   return list.map(src => {
     return new Promise(resolve => {
+      logPageLoader(`Приступаем к скачиванию изображения по ссылке ${src}`);
       axios({
         method: 'get',
         url: src.startsWith('/') ? `${originURL}${src}` : src,
@@ -62,9 +69,12 @@ const writeFile = (nameForDir, list, url) => {
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
           fs.writeFile(pathToFile, answer.data);
+          logPageLoader(`Скачивание изображения ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          logPageLoader(`Скачать изображение по адресу ${src} не получилось`);
+          console.log(err)});
     });
   })
 };

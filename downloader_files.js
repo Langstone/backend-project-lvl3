@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import axios from 'axios';
 import { URL } from 'url';
+import debug from 'debug';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -10,6 +11,8 @@ function changeElement(element) {
   }
   return element;
 };
+
+const logPageLoader = debug('page-loader');
 
 const filtredFilesListFromLink = (url, filepath, tag) => {
   const myURL = new URL(url);
@@ -60,6 +63,7 @@ const writeFile = (nameForDir, list, url) => {
     const directoryNameFromSrcURL = (el) => path.parse(el).dir ===  '/' ? path.parse(el).dir : `${path.parse(el).dir}/`;
     const nameFromSrcURL = path.parse(pathnameSrcURL).name;
     return new Promise(resolve => {
+      logPageLoader(`Приступаем к скачиванию файла ${src}`);
       axios({
         method: 'get',
         url: src,
@@ -78,6 +82,7 @@ const writeFile = (nameForDir, list, url) => {
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
           fs.writeFile(pathToFile, answer.data);
+          logPageLoader(`Скачивание файла ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
         .catch(err => console.log(err));
