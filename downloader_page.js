@@ -2,7 +2,7 @@ import dirname from 'path';
 import { writeFile } from 'fs/promises';
 import axios from 'axios';
 import debug from 'debug';
-import { log } from 'axios-debug-log';
+// import { log } from 'axios-debug-log';
 
 function renameFile(element) {
   if (element.match(/\W/)) {
@@ -14,7 +14,7 @@ function renameFile(element) {
 const logPageLoader = debug('page-loader');
 
 const downloaderPage = ((htmlPath, currentDir = dirname) => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
     axios({
       method: 'get',
@@ -30,8 +30,8 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
       resolve(pathToFile);
     })
     .catch((err) => {
-      logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`)
-      console.log(err);
+      logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
+      reject(err);
     });
   })
 });

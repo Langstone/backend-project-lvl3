@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
+import { rejects } from 'assert';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -18,7 +19,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
   const myURL = new URL(url);
   const hostURL = myURL.host;
   const originURL = myURL.origin; 
-  return new Promise(resolve => {
+  return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         let linkList;
@@ -49,7 +50,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
         }
         resolve(linkList);
       })
-      .catch(err => console.log(err));  
+      .catch(err => rejects(err));  
   })
 };
 
@@ -62,7 +63,7 @@ const writeFile = (nameForDir, list, url) => {
     const pathnameSrcURL = srcURL.pathname;
     const directoryNameFromSrcURL = (el) => path.parse(el).dir ===  '/' ? path.parse(el).dir : `${path.parse(el).dir}/`;
     const nameFromSrcURL = path.parse(pathnameSrcURL).name;
-    return new Promise(resolve => {
+    return new Promise((resolve, rejects) => {
       logPageLoader(`Приступаем к скачиванию файла ${src}`);
       axios({
         method: 'get',
@@ -81,11 +82,11 @@ const writeFile = (nameForDir, list, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
-          fs.writeFile(pathToFile, answer.data);
-          logPageLoader(`Скачивание файла ${src} завершено`);
-          resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
+          fs.writeFile(pathToFile, answer.data)
+            logPageLoader(`Скачивание файла ${src} завершено`);
+            resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
-        .catch(err => console.log(err));
+        .catch(err => rejects(err));
     });
   })
 };
@@ -95,7 +96,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
   const hostURL = myURL.host;
   const originURL = myURL.origin; 
 
-  return new Promise(resolve => {
+  return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         const doc = cheerio.load(response);
@@ -126,12 +127,12 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
             });
         };         
       })
-      .catch(err => console.log(err));
+      .catch(err => rejects(err));
   });
 };
 
 const downloaderFiles = (filepath, nameForDirectory, url) => {
-  return new Promise(resolve => {
+  return new Promise((resolve, rejects) => {
     filtredFilesListFromLink(url, filepath, 'link')
       .then(linkList => {
         const requestPromises = writeFile(nameForDirectory, linkList, url);
@@ -147,7 +148,8 @@ const downloaderFiles = (filepath, nameForDirectory, url) => {
                 })
                   .then(filesPaths => {
                     changePathsInFileFromLink(filepath, filesPaths, url, 'script')
-                      .then(() => resolve());
+                      .then(() => resolve())
+                      .catch(err => rejects(err));
                   });
             });
         });  

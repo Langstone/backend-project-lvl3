@@ -70,4 +70,18 @@ test('check downloader_images', async () => {
     await downloaderFiles(fp, nameForDirectory, 'https://ru.hexlet.io/courses');
     const actual = await readFile(fp, 'utf-8');
     expect(actual).toBe(shared.changedFixtureForImage);
-  })
+  });
+
+  test('downloader_page fails with an error', async () => {
+    nock('https://ru.hexlet.io')
+    .persist()
+    .get('/courses1')
+    .reply(404);
+
+    try {
+      await downloaderPage('https://ru.hexlet.io/courses1', shared.path);
+    }
+    catch (e) {
+      expect(`${e.name} ${e.message}`).toMatch('Error Request failed with status code 404');
+    }
+  });

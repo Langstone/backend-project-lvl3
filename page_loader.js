@@ -12,12 +12,19 @@ command
   .description('page loader utility')
   .arguments('<url>')
   .option('-o, --output [dir]', 'output dir', "/Users/pavelbutorin/Projects/backend-project-lvl3")
-  .action(async url => {
+  .action(url => {
     const options = command.opts();    
-    const path = await downloaderPage(`${url}`, options.output);
-    console.log(path);
-    const nameForDirectory = await downloaderImages(url, path);
-    await downloaderFiles(path, nameForDirectory, url);
+    downloaderPage(`${url}`, options.output)
+      .then((path) => {
+        console.log(path);
+        downloaderImages(url, path)
+      })  
+      .then(nameForDirectory => downloaderFiles(path, nameForDirectory, url))
+      .catch(err => {
+        console.error(`${err.name} ${err.message}`);
+        process.exit(1);
+      });
   })
   .parse(process.argv);
+
   
