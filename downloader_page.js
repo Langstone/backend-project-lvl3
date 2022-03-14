@@ -31,7 +31,8 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
     })
     .catch((err) => {
       logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
-      reject(err);
+      throw err;
+      // reject(err);
     });
   })
 });

@@ -3,7 +3,7 @@ import downloaderPage from './downloader_page.js';
 import downloaderFiles from './downloader_files.js';
 import Listr from 'listr';
 
-export default function pageLoader(url, options) {
+export default function pageLoader(url, output) {
   const tasks = new Listr([
     {
       title: 'Загрузка страницы',
@@ -32,7 +32,7 @@ export default function pageLoader(url, options) {
   
   tasks.run({
     url: url,
-    output: options.output,
+    output: output,
   }).then(ctx => {
     console.log(ctx.path)
   }).catch(err => {
