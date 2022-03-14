@@ -2,7 +2,7 @@ import dirname from 'path';
 import { writeFile } from 'fs/promises';
 import axios from 'axios';
 import debug from 'debug';
-// import { log } from 'axios-debug-log';
+import pkg from 'axios-debug-log';
 
 function renameFile(element) {
   if (element.match(/\W/)) {
@@ -35,4 +35,5 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
     });
   })
 });
+
 export default downloaderPage;

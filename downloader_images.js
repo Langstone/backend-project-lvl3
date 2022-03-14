@@ -57,7 +57,7 @@ const writeFile = (nameForDir, list, url) => {
       axios({
         method: 'get',
         url: src.startsWith('/') ? `${originURL}${src}` : src,
-        responseType: 'stream',  
+        responseType: 'stream',
       })
         .then(answer => {
           const format = path.parse(src).ext;

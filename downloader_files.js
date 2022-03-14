@@ -4,7 +4,6 @@ import fs from 'fs/promises';
 import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
-import { rejects } from 'assert';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -27,26 +26,26 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
         if(tag === 'link') {
           linkList = doc('link').get()
             .map(el => el.attribs.href)
+            .filter(el => el !== undefined)
             .map(el => el.startsWith('/') ? `${originURL}${el}` : el)
             .map(el => {
               const elURl = new URL(el);
               if(elURl.host === hostURL) {
                 return el;
               };
-            })
-            .filter(el => el !== undefined);
+            });
         }  
         else {
           linkList = doc('script').get()
             .map(el => el.attribs.src)
+            .filter(el => el !== undefined)
             .map(el => el.startsWith('/') ? `${originURL}${el}` : el)
             .map(el => {
               const elURl = new URL(el);
               if(elURl.host === hostURL) {
                 return el;
               };
-            })
-            .filter(el => el !== undefined);
+            });
         }
         resolve(linkList);
       })
@@ -55,9 +54,10 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
 };
 
 
-const writeFile = (nameForDir, list, url) => {
+const writeFile = (nameForDir, pathsList, url) => {
   const myURL = new URL(url);
   const hostUrl = myURL.host;
+  const list = pathsList.filter(el => el !== undefined);
   return list.map(src => {
     const srcURL = new URL(src);
     const pathnameSrcURL = srcURL.pathname;
@@ -68,23 +68,22 @@ const writeFile = (nameForDir, list, url) => {
       axios({
         method: 'get',
         url: src,
+        responseType: 'stream',
       })
         .then(answer => {
           const form = (src) => path.parse(src).ext === '' ? '.html' : path.parse(src).ext; 
           const format = form(src);
           const nameForFileWithoutProtocolAndExt = `${hostUrl}${directoryNameFromSrcURL(pathnameSrcURL)}${nameFromSrcURL}`;
-          const fullSrc = (fp) => {
-            return path.parse(fp).ext === '' ? `${fp}.html` : fp;
-          };
+          const fullSrc = (fp) => path.parse(fp).ext === '' ? `${fp}.html` : fp;
           const nameForFileWithoutProtocol = nameForFileWithoutProtocolAndExt.split('');
           const nameForNewFile = nameForFileWithoutProtocol
             .map(element => changeElement(element))
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
-          fs.writeFile(pathToFile, answer.data)
-            logPageLoader(`Скачивание файла ${src} завершено`);
-            resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
+          fs.writeFile(pathToFile, answer.data);
+          logPageLoader(`Скачивание файла ${src} завершено`);
+          resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
         .catch(err => rejects(err));
     });
@@ -102,6 +101,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
         const doc = cheerio.load(response);
         if(tag === 'link') {
           doc('link').get()
+            .filter(el => el !== undefined)
             .filter(el => el.attribs.href.startsWith('/') ? el.attribs.href = `${originURL}${el.attribs.href}` : el)
             .filter(el => new URL(el.attribs.href).host === hostURL)
             .filter(el => path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : `${el.attribs.href}`)
@@ -109,12 +109,14 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const before = doc(link).attr('href');
               const { after } = filesPaths.find(ip => ip.before === before);
               doc(link).attr('href', after);
-              fs.writeFile(filepath, doc.html());
-              resolve();
+              fs.writeFile(filepath, doc.html())
+                .then(() => resolve())
+                .catch(err => rejects(err));
             });
         }
         else {
           doc('script').get()
+          .filter(el => el !== undefined)
             .filter(el => el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el)
             .filter(el => new URL(el.attribs.src).host === hostURL)
             .filter(el => path.parse(el.attribs.src).ext === '' ? el.attribs.src = `${el.attribs.src}.html` : `${el.attribs.src}`)
@@ -122,8 +124,9 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const before = doc(link).attr('src');
               const { after } = filesPaths.find(ip => ip.before === before);
               doc(link).attr('src', after);
-              fs.writeFile(filepath, doc.html());
-              resolve();
+              fs.writeFile(filepath, doc.html())
+              .then(() => resolve())
+              .catch(err => rejects(err));
             });
         };         
       })
