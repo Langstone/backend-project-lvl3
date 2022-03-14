@@ -110,8 +110,6 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const { after } = filesPaths.find(ip => ip.before === before);
               doc(link).attr('href', after);
               fs.writeFile(filepath, doc.html())
-                .then(() => resolve())
-                .catch(err => rejects(err));
             });
         }
         else {
@@ -125,8 +123,6 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const { after } = filesPaths.find(ip => ip.before === before);
               doc(link).attr('src', after);
               fs.writeFile(filepath, doc.html())
-              .then(() => resolve())
-              .catch(err => rejects(err));
             });
         };         
       })
