@@ -5,9 +5,13 @@ import downloaderFiles from './downloader_files.js';
 export default function pageLoader(url, currentDir) {
   return new Promise((resolve, reject) => {
     downloaderPage(url, currentDir)
-      .then(pathToFile => downloaderImages(url, pathToFile))
-      .then(nameForDirectory => downloaderFiles(pathToFile, nameForDirectory, url))
-      .then(() => resolve())
+      .then(pathToFile => {
+        downloaderImages(url, pathToFile)
+          .then(nameForDirectory => {
+            downloaderFiles(pathToFile, nameForDirectory, url)
+              .then(() => resolve());
+          });
+      })
       .catch(err => reject(err));
-  });
-};
+  })
+}
