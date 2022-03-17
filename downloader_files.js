@@ -18,12 +18,12 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
   const myURL = new URL(url);
   const hostURL = myURL.host;
   const originURL = myURL.origin; 
-  return new Promise((resolve, rejects) => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         let linkList;
         const doc = cheerio.load(response);
-        if(tag === 'link') {
+        if (tag === 'link') {
           linkList = doc('link').get()
             .map(el => el.attribs.href)
             .filter(el => el !== undefined)
@@ -34,8 +34,9 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
                 return el;
               };
             });
+          resolve(linkList);
         }  
-        else {
+        if (tag === 'script') {
           linkList = doc('script').get()
             .map(el => el.attribs.src)
             .filter(el => el !== undefined)
@@ -46,10 +47,10 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
                 return el;
               };
             });
+          resolve(linkList);
         }
-        resolve(linkList);
       })
-      .catch(err => rejects(err));  
+      .catch(err => reject(err));  
   })
 };
 
@@ -63,7 +64,7 @@ const writeFile = (nameForDir, pathsList, url) => {
     const pathnameSrcURL = srcURL.pathname;
     const directoryNameFromSrcURL = (el) => path.parse(el).dir ===  '/' ? path.parse(el).dir : `${path.parse(el).dir}/`;
     const nameFromSrcURL = path.parse(pathnameSrcURL).name;
-    return new Promise((resolve, rejects) => {
+    return new Promise((resolve, reject) => {
       logPageLoader(`Приступаем к скачиванию файла ${src}`);
       axios({
         method: 'get',
@@ -85,7 +86,7 @@ const writeFile = (nameForDir, pathsList, url) => {
           logPageLoader(`Скачивание файла ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
-        .catch(err => rejects(err));
+        .catch(err => reject(err));
     });
   })
 };
@@ -95,64 +96,62 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
   const hostURL = myURL.host;
   const originURL = myURL.origin; 
 
-  return new Promise((resolve, rejects) => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         const doc = cheerio.load(response);
         if(tag === 'link') {
           doc('link').get()
-            .filter(el => el !== undefined)
+            .filter(el => el.attribs.href !== undefined)
             .filter(el => el.attribs.href.startsWith('/') ? el.attribs.href = `${originURL}${el.attribs.href}` : el)
             .filter(el => new URL(el.attribs.href).host === hostURL)
-            .filter(el => path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : `${el.attribs.href}`)
+            .filter(el => path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : el.attribs.href = el.attribs.href)
             .map(link => {
-              const before = doc(link).attr('href');
+              const before = link.attribs.href;
               const { after } = filesPaths.find(ip => ip.before === before);
+              logPageLoader(before);
               doc(link).attr('href', after);
-              fs.writeFile(filepath, doc.html())
+              fs.writeFile(filepath, doc.html());
+              resolve();
             });
         }
-        else {
+        if(tag === 'script') {
+          logPageLoader(`Заходим в блок изменения ссылок внутри файла script`);
           doc('script').get()
-          .filter(el => el !== undefined)
-            .filter(el => el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el)
+            .filter(el => el.attribs.src !== undefined)
+            .filter(el => el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el.attribs.src = el.attribs.src)
             .filter(el => new URL(el.attribs.src).host === hostURL)
             .filter(el => path.parse(el.attribs.src).ext === '' ? el.attribs.src = `${el.attribs.src}.html` : `${el.attribs.src}`)
             .map(link => {
               const before = doc(link).attr('src');
               const { after } = filesPaths.find(ip => ip.before === before);
               doc(link).attr('src', after);
-              fs.writeFile(filepath, doc.html())
+              fs.writeFile(filepath, doc.html());
+              resolve();
             });
         };         
       })
-      .catch(err => rejects(err));
+      .catch(err => reject(err));
   });
 };
 
 const downloaderFiles = (filepath, nameForDirectory, url) => {
-  return new Promise((resolve, rejects) => {
+  return new Promise((resolve, reject) => {
     filtredFilesListFromLink(url, filepath, 'link')
-      .then(linkList => {
-        const requestPromises = writeFile(nameForDirectory, linkList, url);
+      .then((linkList) => {
+        const requestPromises = writeFile(nameForDirectory, linkList, url)
         return Promise.all(requestPromises);
       })
-        .then(filesPaths => {
-          changePathsInFileFromLink(filepath, filesPaths, url, 'link')
-            .then(() => {
-              filtredFilesListFromLink(url, filepath, 'script')
-                .then(linkList => {
-                  const requestPromises = writeFile(nameForDirectory, linkList, url);
-                  return Promise.all(requestPromises);
-                })
-                  .then(filesPaths => {
-                    changePathsInFileFromLink(filepath, filesPaths, url, 'script')
-                      .then(() => resolve())
-                      .catch(err => rejects(err));
-                  });
-            });
-        });  
-  });
+      .then((filesPaths) => changePathsInFileFromLink(filepath, filesPaths, url, 'link'))
+      .then(() => filtredFilesListFromLink(url, filepath, 'script'))
+      .then((pathsList) => {
+        const requestPromises = writeFile(nameForDirectory, pathsList, url)
+        return Promise.all(requestPromises);
+      })
+      .then((filesPaths) => changePathsInFileFromLink(filepath, filesPaths, url, 'script'))
+      .then(() => resolve())
+      .catch(err => reject(err));
+  })
 };
 
 export default downloaderFiles;
