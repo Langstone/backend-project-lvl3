@@ -12,7 +12,7 @@ function changeElement(element) {
   return element;
 };
 
-const logPageLoader = debug('page-loader');
+const logPageLoader = debug('downloader-page');
 
 const filtredFilesListFromLink = (url, filepath, tag) => {
   const myURL = new URL(url);
@@ -22,6 +22,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         let linkList;
+        let scriptList;
         const doc = cheerio.load(response);
         if (tag === 'link') {
           linkList = doc('link').get()
@@ -37,7 +38,8 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
           resolve(linkList);
         }  
         if (tag === 'script') {
-          linkList = doc('script').get()
+          logPageLoader('заходим в формирование листа ссылок script');
+            scriptList = doc('script').get()
             .map(el => el.attribs.src)
             .filter(el => el !== undefined)
             .map(el => el.startsWith('/') ? `${originURL}${el}` : el)
@@ -47,7 +49,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
                 return el;
               };
             });
-          resolve(linkList);
+          resolve(scriptList);
         }
       })
       .catch(err => reject(err));  
@@ -97,6 +99,9 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
   const originURL = myURL.origin; 
 
   return new Promise((resolve, reject) => {
+    if (filesPaths.length === 0) {
+      resolve();
+    }
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         const doc = cheerio.load(response);
@@ -107,8 +112,9 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
             .filter(el => new URL(el.attribs.href).host === hostURL)
             .filter(el => path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : el.attribs.href = el.attribs.href)
             .map(link => {
-              const before = link.attribs.href;
-              const { after } = filesPaths.find(ip => ip.before === before);
+              const before = doc(link).attr('href');
+              const found = filesPaths.find(ip => ip.before === before);
+              const { after } = found;
               logPageLoader(before);
               doc(link).attr('href', after);
               fs.writeFile(filepath, doc.html());
@@ -124,7 +130,8 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
             .filter(el => path.parse(el.attribs.src).ext === '' ? el.attribs.src = `${el.attribs.src}.html` : `${el.attribs.src}`)
             .map(link => {
               const before = doc(link).attr('src');
-              const { after } = filesPaths.find(ip => ip.before === before);
+              const found = filesPaths.find(ip => ip.before === before);
+              const { after } = found;
               doc(link).attr('src', after);
               fs.writeFile(filepath, doc.html());
               resolve();

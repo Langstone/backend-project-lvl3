@@ -92,7 +92,8 @@ const changePathsInFile = (filepath, imagePaths) => {
           .filter(el => el !== undefined)
           .map(image => {
             const before = doc(image).attr('src');
-            const { after } = imagePaths.find(ip => ip.before === before);
+            const found = imagePaths.find(ip => ip.before === before);
+            const { after } = found;
             doc(image).attr('src', after);
             fs.writeFile(filepath, doc.html());
             resolve();

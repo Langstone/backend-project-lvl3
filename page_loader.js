@@ -31,7 +31,9 @@ command
         title: 'Загрузка остальных ресурсов',
         task: ctx => downloaderFiles(ctx.path, ctx.nameForDirectory, ctx.url)
       }  
-    ]);
+    ], {
+      renderer: "verbose",
+    });
     
     tasks.run({
       url: url,
