@@ -22,7 +22,6 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         let linkList;
-        let scriptList;
         const doc = cheerio.load(response);
         if (tag === 'link') {
           linkList = doc('link').get()
@@ -39,7 +38,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
         }  
         if (tag === 'script') {
           logPageLoader('заходим в формирование листа ссылок script');
-            scriptList = doc('script').get()
+            linkList = doc('script').get()
             .map(el => el.attribs.src)
             .filter(el => el !== undefined)
             .map(el => el.startsWith('/') ? `${originURL}${el}` : el)
@@ -49,7 +48,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
                 return el;
               };
             });
-          resolve(scriptList);
+          resolve(linkList);
         }
       })
       .catch(err => reject(err));  

@@ -46,3 +46,4 @@ command
     });
   })
   .parse(process.argv);
+
