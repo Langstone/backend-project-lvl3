@@ -55,7 +55,6 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
   })
 };
 
-
 const writeFile = (nameForDir, pathsList, url) => {
   const myURL = new URL(url);
   const hostUrl = myURL.host;
