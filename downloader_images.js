@@ -60,6 +60,7 @@ const writeFile = (nameForDir, list, url) => {
         responseType: 'stream',
       })
         .then(answer => {
+          logPageLoader(`получен ответ от ${src}: ${answer}`);
           const format = path.parse(src).ext;
           const srcDirectory = path.parse(src).dir;
           const srcName = path.parse(src).name;
@@ -70,6 +71,10 @@ const writeFile = (nameForDir, list, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
+          if (answer.data === null) {
+            fs.open(pathToFile, 'w');
+            resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
+          }
           fs.writeFile(pathToFile, answer.data);
           logPageLoader(`Скачивание изображения ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });

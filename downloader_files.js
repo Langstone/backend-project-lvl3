@@ -72,6 +72,7 @@ const writeFile = (nameForDir, pathsList, url) => {
         responseType: 'stream',
       })
         .then(answer => {
+          logPageLoader(`получен ответ от ${src}: ${answer}`);
           const form = (src) => path.parse(src).ext === '' ? '.html' : path.parse(src).ext; 
           const format = form(src);
           const nameForFileWithoutProtocolAndExt = `${hostUrl}${directoryNameFromSrcURL(pathnameSrcURL)}${nameFromSrcURL}`;
@@ -84,6 +85,7 @@ const writeFile = (nameForDir, pathsList, url) => {
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
           if (answer.data === null) {
             fs.open(pathToFile, 'w');
+            resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });  
           };
           fs.writeFile(pathToFile, answer.data);
           logPageLoader(`Скачивание файла ${src} завершено`);
