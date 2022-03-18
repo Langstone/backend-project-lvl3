@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
+import pkg from 'axios-debug-log';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -12,7 +13,7 @@ function changeElement(element) {
   return element;
 };
 
-const logPageLoader = debug('page-loader');
+const logPageLoader = debug('downloader-images');
 
 const createDirectory = (filepath) => {
   return new Promise((resolve, rejects) => {
@@ -60,7 +61,7 @@ const writeFile = (nameForDir, list, url) => {
         responseType: 'stream',
       })
         .then(answer => {
-          logPageLoader(`получен ответ от ${src}: ${answer}`);
+          logPageLoader(`получен ответ от ${src}`);
           const format = path.parse(src).ext;
           const srcDirectory = path.parse(src).dir;
           const srcName = path.parse(src).name;
