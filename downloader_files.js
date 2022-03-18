@@ -25,7 +25,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
         let linkList;
         const doc = cheerio.load(response);
         if (tag === 'link') {
-          logPageLoader('Заходим в формирование листа ссылок link');
+          logPageLoader('Заходим в формирование листа ссылок с тегом "link"');
           linkList = doc('link').get()
             .map(el => el.attribs.href)
             .filter(el => el !== undefined)
@@ -39,7 +39,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
           resolve(linkList);
         }  
         if (tag === 'script') {
-          logPageLoader('Заходим в формирование листа ссылок script');
+          logPageLoader('Заходим в формирование листа ссылок с тегом "script"');
             linkList = doc('script').get()
             .map(el => el.attribs.src)
             .filter(el => el !== undefined)
@@ -71,7 +71,6 @@ const writeFile = (nameForDir, pathsList, url) => {
       axios({
         method: 'get',
         url: src,
-        responseType: 'stream',
       })
         .then(answer => {
           logPageLoader(`Получен ответ от ${src}`);
@@ -89,8 +88,6 @@ const writeFile = (nameForDir, pathsList, url) => {
           fs.writeFile(pathToFile, answer.data);
           logPageLoader(`Скачивание файла ${src} завершено`);
           logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
-          // logPageLoader(`after: ${path.basename(nameForDir)}/${nameForNewFile}`);
-          // logPageLoader(`before: ${fullSrc(src)}`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
         .catch(err => reject(err));
