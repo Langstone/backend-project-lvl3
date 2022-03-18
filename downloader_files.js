@@ -13,7 +13,7 @@ function changeElement(element) {
   return element;
 };
 
-const logPageLoader = debug('downloader-files');
+const logPageLoader = debug('page-loader');
 
 const filtredFilesListFromLink = (url, filepath, tag) => {
   const myURL = new URL(url);
