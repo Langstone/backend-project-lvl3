@@ -108,6 +108,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
       .then(response => {
         const doc = cheerio.load(response);
         if(tag === 'link') {
+          logPageLoader(`Заходим в блок изменения ссылок с тегом 'link'`);
           doc('link').get()
             .filter(el => el.attribs.href !== undefined)
             .filter(el => el.attribs.href.startsWith('/') ? el.attribs.href = `${originURL}${el.attribs.href}` : el)
@@ -124,7 +125,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
             });
         }
         if(tag === 'script') {
-          logPageLoader(`Заходим в блок изменения ссылок внутри файла script`);
+          logPageLoader(`Заходим в блок изменения ссылок с тегом 'script'`);
           doc('script').get()
             .filter(el => el.attribs.src !== undefined)
             .filter(el => el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el.attribs.src = el.attribs.src)
