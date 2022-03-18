@@ -31,7 +31,7 @@ const createDirectory = (filepath) => {
 };
 
 const filtredImageList = (filepath) => {
-  logPageLoader(`приступаем к формированию списка изображений`);
+  logPageLoader(`Приступаем к формированию списка изображений`);
   return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
@@ -43,7 +43,7 @@ const filtredImageList = (filepath) => {
           }
           return el;
         }).filter(el => el !== undefined);
-        logPageLoader(`формирование списка изображений завершено`);
+        logPageLoader(`Формирование списка изображений завершено`);
         resolve(filtredImageList);
       })
       .catch(err => rejects(err));
@@ -51,7 +51,7 @@ const filtredImageList = (filepath) => {
 };
 
 const writeFile = (nameForDir, list, url) => {
-  logPageLoader(`получен список изображений ${list}`);
+  logPageLoader(`Получен список изображений ${list}`);
   const myURL = new URL(url);
   const originURL = myURL.origin;
   const hostUrl = myURL.host;
@@ -75,7 +75,7 @@ const writeFile = (nameForDir, list, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
-          logPageLoader(`приступаем к записи файла с изображением`);
+          logPageLoader(`приступаем к записи файла ${src} с изображением`);
           fs.writeFile(pathToFile, answer.data);
           logPageLoader(`Скачивание изображения ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
