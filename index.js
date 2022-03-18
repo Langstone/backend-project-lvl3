@@ -9,10 +9,7 @@ export default function pageLoader(url, currentDir) {
         downloaderImages(url, pathToFile)
           .then(nameForDirectory => {
             downloaderFiles(pathToFile, nameForDirectory, url)
-              .then(() => {
-                console.log(readFile(pathToFile));
-                resolve();
-              });
+              .then(() => resolve());
           });
       })
       .catch(err => reject(err));
