@@ -76,7 +76,10 @@ const writeFile = (nameForDir, list, url) => {
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
           logPageLoader(`приступаем к записи файла ${src} с изображением`);
-          fs.writeFile(pathToFile, answer.data.pipe(fs.cteateWriteStream(src)));
+          fs.writeFile(pathToFile, answer.data);
+          // const readableStream = answer.data;
+          // const writeableStream = fs.createWriteStream(pathToFile);
+          // readableStream.pipe(writeableStream);
           logPageLoader(`Скачивание изображения ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
         })
