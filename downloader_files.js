@@ -85,11 +85,12 @@ const writeFile = (nameForDir, pathsList, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
+          logPageLoader(`${answer.data} for ${pathToFile}`);
           fs.writeFile(pathToFile, answer.data);
           logPageLoader(`Скачивание файла ${src} завершено`);
           logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
-          logPageLoader(`after: ${path.basename(nameForDir)}/${nameForNewFile}`);
-          logPageLoader(`before: ${fullSrc(src)}`);
+          // logPageLoader(`after: ${path.basename(nameForDir)}/${nameForNewFile}`);
+          // logPageLoader(`before: ${fullSrc(src)}`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
         .catch(err => reject(err));
