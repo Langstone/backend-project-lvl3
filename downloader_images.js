@@ -35,7 +35,11 @@ const filtredImageList = (filepath) => {
   return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
-        const doc = cheerio.load(response);
+        const doc = cheerio.load(response, {
+          xml: {
+            normalizeWhitespace: true,
+          },
+        });
         const imageList = doc('img').get().map(e => e.attribs.src);
         const filtredImageList = imageList.filter(el => {
           if(el.startsWith('data')) {
@@ -61,7 +65,6 @@ const writeFile = (nameForDir, list, url) => {
       axios({
         method: 'get',
         url: src.startsWith('/') ? `${originURL}${src}` : src,
-        // responseType: 'stream',
       })
         .then(answer => {
           logPageLoader(`получен ответ от ${src}`);
@@ -77,9 +80,6 @@ const writeFile = (nameForDir, list, url) => {
           const pathToFile = nameForDir.concat( "/" + nameForNewFile);
           logPageLoader(`приступаем к записи файла ${src} с изображением`);
           fs.writeFile(pathToFile, answer.data);
-          // const readableStream = answer.data;
-          // const writeableStream = fs.createWriteStream(pathToFile);
-          // readableStream.pipe(writeableStream);
           logPageLoader(`Скачивание изображения ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
         })
@@ -95,7 +95,11 @@ const changePathsInFile = (filepath, imagePaths) => {
   return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
-        const doc = cheerio.load(response);
+        const doc = cheerio.load(response, {
+          xml: {
+            normalizeWhitespace: true,
+          },
+        });
         doc('img').get()
           .filter(el => el.attribs.src.startsWith('data') ? undefined : el.attribs.src)
           .filter(el => el !== undefined)

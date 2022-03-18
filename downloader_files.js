@@ -137,7 +137,6 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               doc(link).attr('src', after);
               fs.writeFile(filepath, doc.html());
               logPageLoader(`Ссылки с тегом 'script' изменены`);
-              logPageLoader(fs.readFile(filepath));
               resolve();
             });
         };         
