@@ -39,7 +39,7 @@ const filtredImageList = (filepath) => {
         const doc = cheerio.load(response);
         const imageList = doc('img').get().map(e => e.attribs.src);
         const filtredImageList = imageList.filter(el => {
-          if(el.startsWith('data')) {
+          if (el.startsWith('data')) {
             return undefined;
           }
           return el;
@@ -74,7 +74,7 @@ const writeFile = (nameForDir, list, url) => {
             .map(element => changeElement(element))
             .join('')
             .concat(format);
-          const pathToFile = nameForDir.concat( "/" + nameForNewFile);
+          const pathToFile = nameForDir.concat("/" + nameForNewFile);
           logPageLoader(`приступаем к записи файла ${src} с изображением`);
           fs.writeFile(pathToFile, answer.data);
           logPageLoader(`Скачивание изображения ${src} завершено`);
@@ -114,15 +114,15 @@ const downloaderImages = (url, filepath) => {
     createDirectory(filepath)
       .then(nameForDir => {
         filtredImageList(filepath)
-        .then(list => {
-          const requestPromises = writeFile(nameForDir, list, url);
-          return Promise.all(requestPromises);
-        })  
-        .then(imagePaths => {
-          changePathsInFile(filepath, imagePaths)
-          .then(() => resolve(nameForDir))
-          .catch(err => rejects(err));
-        });
+          .then(list => {
+            const requestPromises = writeFile(nameForDir, list, url);
+            return Promise.all(requestPromises);
+          })
+          .then(imagePaths => {
+            changePathsInFile(filepath, imagePaths)
+              .then(() => resolve(nameForDir))
+              .catch(err => rejects(err));
+          });
       });
   });
 };
