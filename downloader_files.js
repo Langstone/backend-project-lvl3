@@ -136,7 +136,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const found = filesPaths.find(ip => ip.before === before);
               const { after } = found;
               doc(link).attr('src', after);
-              fs.writeFile(filepath, doc.html());
+              fs.writeFile(filepath, doc.html().trim());
               logPageLoader(`Ссылки с тегом 'script' изменены`);
               resolve();
             });
