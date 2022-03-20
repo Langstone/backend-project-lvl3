@@ -5,6 +5,7 @@ import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
+import htmlparser2 from 'htmlparser2';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -35,11 +36,7 @@ const filtredImageList = (filepath) => {
   return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
-        const doc = cheerio.load(response, {
-          xml: {
-            normalizeWhitespace: true,
-          },
-        });
+        const doc = cheerio.load(response);
         const imageList = doc('img').get().map(e => e.attribs.src);
         const filtredImageList = imageList.filter(el => {
           if(el.startsWith('data')) {
@@ -95,11 +92,7 @@ const changePathsInFile = (filepath, imagePaths) => {
   return new Promise((resolve, rejects) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
-        const doc = cheerio.load(response, {
-          xml: {
-            normalizeWhitespace: true,
-          },
-        });
+        const doc = cheerio.load(response);
         doc('img').get()
           .filter(el => el.attribs.src.startsWith('data') ? undefined : el.attribs.src)
           .filter(el => el !== undefined)

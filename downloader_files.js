@@ -5,6 +5,7 @@ import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
+import htmlparser2 from 'htmlparser2';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
