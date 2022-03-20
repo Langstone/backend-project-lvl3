@@ -1,5 +1,5 @@
 import dirname from 'path';
-import { writeFile } from 'fs/promises';
+import fs from 'fs/promises';
 import axios from 'axios';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
@@ -25,9 +25,11 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
         const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
         const pathToFile = currentDir.concat("/" + nameForNewFile);
         logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
-        writeFile(pathToFile, response.data.trim());
-        logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
-        resolve(pathToFile);
+        fs.writeFile(pathToFile, response.data.trim())
+          .then(() => {
+            logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
+            resolve(pathToFile);
+          });
       })
       .catch((err) => {
         logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
