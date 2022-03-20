@@ -20,19 +20,19 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
       method: 'get',
       url: htmlPath,
     })
-    .then(async response => {
-      const nameForFileWithoutProtocol = htmlPath.slice(8).split('');
-      const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
-      const pathToFile = currentDir.concat( "/" + nameForNewFile);
-      logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
-      await writeFile(pathToFile, response.data);
-      logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
-      resolve(pathToFile);
-    })
-    .catch((err) => {
-      logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
-      reject(err);
-    });
+      .then(response => {
+        const nameForFileWithoutProtocol = htmlPath.slice(8).split('');
+        const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
+        const pathToFile = currentDir.concat("/" + nameForNewFile);
+        logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
+        writeFile(pathToFile, response.data.trim());
+        logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
+        resolve(pathToFile);
+      })
+      .catch((err) => {
+        logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
+        reject(err);
+      });
   })
 });
 
