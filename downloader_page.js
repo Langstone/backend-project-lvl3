@@ -20,7 +20,7 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
     };
     fs.stat(currentDir)
       .then(stats => {
-        if (!stats.isDirectory) {
+        if (!stats.isDirectory()) {
           reject();
         }
       })
