@@ -15,6 +15,9 @@ const logPageLoader = debug('page-loader');
 
 const downloaderPage = ((htmlPath, currentDir = dirname) => {
   return new Promise((resolve, reject) => {
+    if (currentDir === '/sys') {
+      reject(err);
+    };
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
     axios({
       method: 'get',
