@@ -15,7 +15,7 @@ const logPageLoader = debug('page-loader');
 
 const downloaderPage = ((htmlPath, currentDir = dirname) => {
   return new Promise((resolve, reject) => {
-    if (currentDir === '/sys') {
+    if (currentDir === '/sys' && '/system') {
       reject(err);
     };
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
@@ -28,11 +28,9 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
         const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
         const pathToFile = currentDir.concat("/" + nameForNewFile);
         logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
-        fs.writeFile(pathToFile, response.data.trim())
-          .then(() => {
-            logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
-            resolve(pathToFile);
-          });
+        fs.writeFile(pathToFile, response.data);
+        logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
+        resolve(pathToFile);
       })
       .catch((err) => {
         logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
