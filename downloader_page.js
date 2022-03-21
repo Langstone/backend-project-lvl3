@@ -18,6 +18,12 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
     if (currentDir === '/sys' && '/system') {
       reject(err);
     };
+    fs.stat(currentDir)
+      .then(stats => {
+        if (!stats.isDirectory) {
+          reject();
+        }
+      })
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
     axios({
       method: 'get',
