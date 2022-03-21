@@ -19,11 +19,7 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
       reject(err);
     };
     fs.stat(currentDir)
-      .then(stats => {
-        if (!stats.isDirectory()) {
-          reject();
-        }
-      })
+      .catch(err => reject(err));
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
     axios({
       method: 'get',
