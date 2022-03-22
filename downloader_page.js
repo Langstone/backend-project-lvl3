@@ -16,9 +16,11 @@ const logPageLoader = debug('page-loader');
 
 const downloaderPage = ((htmlPath, currentDir = dirname) => {
   return new Promise((resolve, reject) => {
-    if (typeof currentDir === 'object') {
-      console.log(currentDir.dirname);
-    }
+    // if (typeof currentDir === 'object') {
+    //   console.log(currentDir.dirname);
+    // }
+    console.log(currentDir);
+    console.log(dirname);
     if (currentDir === '/sys' && '/system') {
       reject(err);
     };
