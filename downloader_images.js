@@ -57,13 +57,13 @@ const writeFile = (nameForDir, list, url) => {
   const originURL = myURL.origin;
   const hostUrl = myURL.host;
   return list.map(src => {
-    return new Promise((resolve, rejects) => {
+    return new Promise((resolve, reject) => {
       logPageLoader(`Приступаем к скачиванию изображения по ссылке ${src}`);
       axios({
         method: 'get',
         url: src.startsWith('/') ? `${originURL}${src}` : src,
       })
-        .then(answer => {
+        .then(responseImg => {
           logPageLoader(`получен ответ от ${src}`);
           const format = path.parse(src).ext;
           const srcDirectory = path.parse(src).dir;
@@ -76,13 +76,14 @@ const writeFile = (nameForDir, list, url) => {
             .concat(format);
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
           logPageLoader(`приступаем к записи файла ${src} с изображением`);
-          fs.writeFile(pathToFile, answer.data.trim());
+          fs.writeFile(pathToFile, responseImg.data)
+            .catch(err => reject(err));
           logPageLoader(`Скачивание изображения ${src} завершено`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
         })
         .catch(err => {
           logPageLoader(`Скачать изображение по адресу ${src} не получилось`);
-          rejects(err);
+          reject(err);
         });
     });
   })
@@ -101,7 +102,7 @@ const changePathsInFile = (filepath, imagePaths) => {
             const found = imagePaths.find(ip => ip.before === before);
             const { after } = found;
             doc(image).attr('src', after);
-            fs.writeFile(filepath, doc.html().trim());
+            fs.writeFile(filepath, doc.html());
             resolve();
           });
       })

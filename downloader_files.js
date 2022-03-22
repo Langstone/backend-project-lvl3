@@ -73,7 +73,7 @@ const writeFile = (nameForDir, pathsList, url) => {
         method: 'get',
         url: src,
       })
-        .then(answer => {
+        .then(answerFiles => {
           logPageLoader(`Получен ответ от ${src}`);
           const form = (src) => path.parse(src).ext === '' ? '.html' : path.parse(src).ext;
           const format = form(src);
@@ -85,7 +85,7 @@ const writeFile = (nameForDir, pathsList, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
-          fs.writeFile(pathToFile, answer.data.trim());
+          fs.writeFile(pathToFile, answerFiles.data);
           logPageLoader(`Скачивание файла ${src} завершено`);
           logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
@@ -136,7 +136,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const found = filesPaths.find(ip => ip.before === before);
               const { after } = found;
               doc(link).attr('src', after);
-              fs.writeFile(filepath, doc.html().trim());
+              fs.writeFile(filepath, doc.html());
               logPageLoader(`Ссылки с тегом 'script' изменены`);
               resolve();
             });

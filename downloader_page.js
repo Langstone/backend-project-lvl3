@@ -30,7 +30,8 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
         const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
         const pathToFile = currentDir.concat("/" + nameForNewFile);
         logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
-        fs.writeFile(pathToFile, response.data);
+        fs.writeFile(pathToFile, response.data)
+          .catch(err => reject(err));
         logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
         resolve(pathToFile);
       })
