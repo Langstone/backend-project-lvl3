@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import axios from 'axios';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
-import { stat } from 'fs';
+import path from 'path';
 
 function renameFile(element) {
   if (element.match(/\W/)) {
@@ -14,13 +14,13 @@ function renameFile(element) {
 
 const logPageLoader = debug('page-loader');
 
-const downloaderPage = ((htmlPath, currentDir = dirname) => {
+const downloaderPage = ((htmlPath, currentDir = __dirname) => {
   return new Promise((resolve, reject) => {
     // if (typeof currentDir === 'object') {
     //   console.log(currentDir.dirname);
     // }
-    console.log(currentDir);
-    console.log(dirname);
+    // console.log(currentDir);
+    console.log(path.parse(currentDir));
     if (currentDir === '/sys' && '/system') {
       reject(err);
     };
