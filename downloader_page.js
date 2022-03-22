@@ -18,8 +18,9 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
     if (currentDir === '/sys' && '/system') {
       reject(err);
     };
-    fs.stat(currentDir)
-      .catch(err => reject(err));
+    if (fs.stat(currentDir).then(stats => !stats.isDirectory())) {
+      reject(new Error(`ENOTDIR: not a directory, mkdir ${currentDir}`));
+    }
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
     axios({
       method: 'get',
