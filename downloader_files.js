@@ -84,7 +84,7 @@ const writeFile = (nameForDir, pathsList, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
-          fs.writeFile(pathToFile, answerFiles.data);
+          fs.writeFile(pathToFile, `${answerFiles.data}'\n'`);
           logPageLoader(`Скачивание файла ${src} завершено`);
           logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
