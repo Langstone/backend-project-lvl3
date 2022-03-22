@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import axios from 'axios';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
+import { stat } from 'fs';
 
 function renameFile(element) {
   if (element.match(/\W/)) {
@@ -18,9 +19,13 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
     if (currentDir === '/sys' && '/system') {
       reject(err);
     };
-    if (fs.stat(currentDir).then(stats => !stats.isDirectory())) {
-      reject(new Error(`ENOTDIR: not a directory, mkdir ${currentDir}`));
-    }
+    fs.stat(currentDir)
+      .then(stats => {
+        if (!stats.isDirectory()) {
+          reject(new Error(`ENOENT: no such directory ${currentDir}`))
+        };
+      })
+      .catch(err => reject(err));
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);
     axios({
       method: 'get',
