@@ -23,7 +23,7 @@ const downloaderPage = ((htmlPath, currentDir = dirname) => {
       .then(stats => {
         if (!stats.isDirectory()) {
           reject(new Error(`ENOENT: no such directory ${currentDir}`))
-        };
+        }
       })
       .catch(err => reject(err));
     logPageLoader(`Отправляем запрос на страницу ${htmlPath}`);

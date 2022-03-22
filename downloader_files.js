@@ -5,7 +5,6 @@ import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
-import htmlparser2 from 'htmlparser2';
 
 function changeElement(element) {
   if (element.match(/\W/)) {
@@ -85,7 +84,8 @@ const writeFile = (nameForDir, pathsList, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
-          fs.writeFile(pathToFile, answerFiles.data);
+          console.log(answerFiles.data);
+          fs.writeFile(pathToFile, answerFiles.data.trim());
           logPageLoader(`Скачивание файла ${src} завершено`);
           logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
