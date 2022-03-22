@@ -73,6 +73,7 @@ const writeFile = (nameForDir, pathsList, url) => {
         url: src,
       })
         .then(answerFiles => {
+          console.log(answerFiles);
           logPageLoader(`Получен ответ от ${src}`);
           const form = (src) => path.parse(src).ext === '' ? '.html' : path.parse(src).ext;
           const format = form(src);
