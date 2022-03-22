@@ -73,7 +73,6 @@ const writeFile = (nameForDir, pathsList, url) => {
         url: src,
       })
         .then(answerFiles => {
-          console.log(answerFiles.data);
           logPageLoader(`Получен ответ от ${src}`);
           const form = (src) => path.parse(src).ext === '' ? '.html' : path.parse(src).ext;
           const format = form(src);
@@ -85,7 +84,11 @@ const writeFile = (nameForDir, pathsList, url) => {
             .join('')
             .concat(format);
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
-          fs.writeFile(pathToFile, "\ufeff" + answerFiles.data);
+          if (format === '.css') {
+            fs.writeFile(pathToFile, "\ufeff" + answerFiles.data);
+          } else {
+            fs.writeFile(pathToFile, answerFiles.data);
+          };
           logPageLoader(`Скачивание файла ${src} завершено`);
           logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
           resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
