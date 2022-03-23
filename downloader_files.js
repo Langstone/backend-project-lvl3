@@ -85,13 +85,22 @@ const writeFile = (nameForDir, pathsList, url) => {
             .concat(format);
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
           if (format === '.css') {
-            fs.writeFile(pathToFile, "\ufeff" + answerFiles.data);
+            fs.writeFile(pathToFile, "\ufeff" + answerFiles.data)
+              .then(() => {
+                logPageLoader(`Скачивание файла ${src} завершено`);
+                logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
+                resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
+              })
+              .catch(err => reject(err));
           } else {
-            fs.writeFile(pathToFile, answerFiles.data);
+            fs.writeFile(pathToFile, answerFiles.data)
+              .then(() => {
+                logPageLoader(`Скачивание файла ${src} завершено`);
+                logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
+                resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
+              })
+              .catch(err => reject(err));
           };
-          logPageLoader(`Скачивание файла ${src} завершено`);
-          logPageLoader(`Файл ${src} находится в: ${pathToFile}`);
-          resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: fullSrc(src) });
         })
         .catch(err => reject(err));
     });
@@ -122,9 +131,12 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const found = filesPaths.find(ip => ip.before === before);
               const { after } = found;
               doc(link).attr('href', after);
-              fs.writeFile(filepath, doc.html());
-              logPageLoader(`Ссылки с тегом 'link' изменены`);
-              resolve();
+              fs.writeFile(filepath, doc.html())
+                .then(() => {
+                  logPageLoader(`Ссылки с тегом 'link' изменены`);
+                  resolve();
+                })
+                .catch(err => reject(err));
             });
         }
         if (tag === 'script') {
@@ -139,9 +151,12 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
               const found = filesPaths.find(ip => ip.before === before);
               const { after } = found;
               doc(link).attr('src', after);
-              fs.writeFile(filepath, doc.html());
-              logPageLoader(`Ссылки с тегом 'script' изменены`);
-              resolve();
+              fs.writeFile(filepath, doc.html())
+                .then(() => {
+                  logPageLoader(`Ссылки с тегом 'script' изменены`);
+                  resolve();
+                })
+                .catch(err => reject(err));
             });
         };
       })

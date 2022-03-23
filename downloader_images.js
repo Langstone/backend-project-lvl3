@@ -76,9 +76,11 @@ const writeFile = (nameForDir, list, url) => {
           const pathToFile = nameForDir.concat("/" + nameForNewFile);
           logPageLoader(`приступаем к записи файла ${src} с изображением`);
           fs.writeFile(pathToFile, responseImg.data)
+            .then(() => {
+              logPageLoader(`Скачивание изображения ${src} завершено`);
+              resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
+            })
             .catch(err => reject(err));
-          logPageLoader(`Скачивание изображения ${src} завершено`);
-          resolve({ after: `${path.basename(nameForDir)}/${nameForNewFile}`, before: src });
         })
         .catch(err => {
           logPageLoader(`Скачать изображение по адресу ${src} не получилось`);
@@ -89,7 +91,7 @@ const writeFile = (nameForDir, list, url) => {
 };
 
 const changePathsInFile = (filepath, imagePaths) => {
-  return new Promise((resolve, rejects) => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filepath, 'utf-8')
       .then(response => {
         const doc = cheerio.load(response);
@@ -101,11 +103,12 @@ const changePathsInFile = (filepath, imagePaths) => {
             const found = imagePaths.find(ip => ip.before === before);
             const { after } = found;
             doc(image).attr('src', after);
-            fs.writeFile(filepath, doc.html());
-            resolve();
+            fs.writeFile(filepath, doc.html())
+              .then(() => resolve())
+              .catch(err => reject(err));
           });
       })
-      .catch(err => rejects(err));
+      .catch(err => reject(err));
   });
 };
 
