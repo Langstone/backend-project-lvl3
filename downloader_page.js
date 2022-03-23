@@ -37,9 +37,11 @@ const downloaderPage = ((htmlPath, currentDir = process.cwd()) => {
         const pathToFile = currentDir.concat("/" + nameForNewFile);
         logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
         fs.writeFile(pathToFile, response.data)
+          .then(() => {
+            logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
+            resolve(pathToFile);
+          })
           .catch(err => reject(err));
-        logPageLoader(`Загрузка страницы ${htmlPath} завершена`);
-        resolve(pathToFile);
       })
       .catch((err) => {
         logPageLoader(`Перейти по ссылке ${htmlPath} не получилось`);
