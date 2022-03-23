@@ -12,7 +12,7 @@ command.version('0.0.1');
 command
   .description('page loader utility')
   .arguments('<url>')
-  .option('-o, --output [dir]', 'output dir', "/Users/pavelbutorin/Projects/backend-project-lvl3")
+  .option('-o, --output [dir]', 'output dir', process.cwd())
   .action(url => {
     const options = command.opts();    
 
