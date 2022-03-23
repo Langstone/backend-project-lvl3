@@ -4,6 +4,7 @@ import axios from 'axios';
 import debug from 'debug';
 import pkg from 'axios-debug-log';
 import path from 'path';
+import { URL } from 'url';
 
 function renameFile(element) {
   if (element.match(/\W/)) {
@@ -32,7 +33,9 @@ const downloaderPage = ((htmlPath, currentDir = process.cwd()) => {
       url: htmlPath,
     })
       .then(response => {
-        const nameForFileWithoutProtocol = htmlPath.slice(8).split('');
+        const urlHtmlPath = new URL(htmlPath);
+        const protocol = urlHtmlPath.protocol;
+        const nameForFileWithoutProtocol = htmlPath.replace(protocol, "").replace('//', "").split('');
         const nameForNewFile = nameForFileWithoutProtocol.map(element => renameFile(element)).join('').concat('.html');
         const pathToFile = currentDir.concat("/" + nameForNewFile);
         logPageLoader(`Запрос на страницу ${htmlPath} прошел успешно, приступаем к загрузке`);
