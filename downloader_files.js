@@ -4,7 +4,6 @@ import fs from 'fs/promises';
 import axios from 'axios';
 import { URL } from 'url';
 import debug from 'debug';
-import pkg from 'axios-debug-log';
 
 function changeElement(element) {
   if (element.match(/\W/)) {

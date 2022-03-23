@@ -1,9 +1,6 @@
-import dirname from 'path';
 import fs from 'fs/promises';
 import axios from 'axios';
 import debug from 'debug';
-import pkg from 'axios-debug-log';
-import path from 'path';
 import { URL } from 'url';
 
 function renameFile(element) {
