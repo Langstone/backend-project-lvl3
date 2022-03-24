@@ -14,8 +14,8 @@ function changeElement(element) {
 
 const logPageLoader = debug('page-loader');
 
-const createDirectory = (filepath) => {
-  return new Promise((resolve, rejects) => {
+const createDirectory = ((filepath) => (
+  new Promise((resolve, rejects) => {
     logPageLoader('Создаем директорию для загрузки файлов');
     const dirrectory = path.parse(filepath).dir;
     const nameForDirrectory = path.parse(filepath).name.concat('_files');
@@ -26,8 +26,8 @@ const createDirectory = (filepath) => {
         resolve(nameForDir);
       })
       .catch((err) => rejects(err));
-  });
-};
+  })
+));
 
 const filtredImageList = (filepath) => {
   logPageLoader('Приступаем к формированию списка изображений');
@@ -54,8 +54,8 @@ const writeFile = (nameForDir, list, url) => {
   const myURL = new URL(url);
   const originURL = myURL.origin;
   const hostUrl = myURL.host;
-  return list.map((src) => {
-    return new Promise((resolve, reject) => {
+  return list.map((src) => (
+    new Promise((resolve, reject) => {
       logPageLoader(`Приступаем к скачиванию изображения по ссылке ${src}`);
       axios({
         method: 'get',
@@ -85,12 +85,12 @@ const writeFile = (nameForDir, list, url) => {
           logPageLoader(`Скачать изображение по адресу ${src} не получилось`);
           reject(err);
         });
-    });
-  });
+    })
+  ));
 };
 
-const changePathsInFile = (filepath, imagePaths) => {
-  return new Promise((resolve, reject) => {
+const changePathsInFile = ((filepath, imagePaths) => (
+  new Promise((resolve, reject) => {
     fs.readFile(filepath, 'utf-8')
       .then((response) => {
         const doc = cheerio.load(response);
@@ -108,11 +108,11 @@ const changePathsInFile = (filepath, imagePaths) => {
           });
       })
       .catch((err) => reject(err));
-  });
-};
+  })
+));
 
-const downloaderImages = (url, filepath) => {
-  return new Promise((resolve, rejects) => {
+const downloaderImages = ((url, filepath) => (
+  new Promise((resolve, rejects) => {
     createDirectory(filepath)
       .then((nameForDir) => {
         filtredImageList(filepath)
@@ -126,6 +126,6 @@ const downloaderImages = (url, filepath) => {
               .catch((err) => rejects(err));
           });
       });
-  });
-};
+  })
+));
 export default downloaderImages;

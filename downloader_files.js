@@ -123,7 +123,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
             .filter((el) => new URL(el.attribs.href).host === hostURL)
             .filter((el) => {
               const e = el;
-              if (path.parse(e.attribs.href).ext === '' ) {
+              if (path.parse(e.attribs.href).ext === '') {
                 e.attribs.href = `${e.attribs.href}.html`;
                 return e.attribs.href;
               }
@@ -181,8 +181,8 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
   });
 };
 
-const downloaderFiles = (filepath, nameForDirectory, url) => {
-  return new Promise((resolve, reject) => {
+const downloaderFiles = ((filepath, nameForDirectory, url) => (
+  new Promise((resolve, reject) => {
     filtredFilesListFromLink(url, filepath, 'link')
       .then((linkList) => {
         const requestPromises = writeFile(nameForDirectory, linkList, url);
@@ -197,6 +197,6 @@ const downloaderFiles = (filepath, nameForDirectory, url) => {
       .then((filesPaths) => changePathsInFileFromLink(filepath, filesPaths, url, 'script'))
       .then(() => resolve())
       .catch((err) => reject(err));
-  });
-};
+  })
+));
 export default downloaderFiles;
