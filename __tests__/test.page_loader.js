@@ -47,12 +47,13 @@ test('check downloader_images', async () => {
       'content-type': 'application/octet-stream',
       'content-disposition': 'attachment; filename=reply_file_2.tar.gz',
     });
+
   const fp = await downloaderPage('https://ru.hexlet.io/courses', shared.path);
   await downloaderImages('https://ru.hexlet.io/courses', fp);
   const actual = await readFile(fp, 'utf-8');
-  expect(actual).toEqual(shared.changedFixture);
-  expect(access(`${shared.path}/ru-hexlet-io-courses_files`, constants.R_OK | constants.W_OK));
-  expect(access(`${shared.path}/ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png`, constants.R_OK | constants.W_OK));
+  await expect(actual).toEqual(shared.changedFixture);
+  await expect(access(`${shared.path}/ru-hexlet-io-courses_files`, constants.R_OK | constants.W_OK)).toBeDefined();
+  await expect(access(`${shared.path}/ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png`, constants.R_OK | constants.W_OK)).toBeDefined();
 });
 
 test('check downloader_files', async () => {
@@ -75,12 +76,7 @@ test('downloader_page fails with an error', async () => {
   nock('https://ru.hexlet.io')
     .persist()
     .get('/courses1')
-    .reply(404);
+    .replyWithError('something went wrong');
 
-  try {
-    await downloaderPage('https://ru.hexlet.io/courses1', shared.path);
-  }
-  catch (e) {
-    expect(`${e.name} ${e.message}`).toMatch('Error Request failed with status code 404');
-  }
+    await expect(downloaderPage('https://ru.hexlet.io/courses1', shared.path)).rejects.toThrow();
 });
