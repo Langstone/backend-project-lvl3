@@ -15,7 +15,7 @@ function changeElement(element) {
 const logPageLoader = debug('page-loader');
 
 const createDirectory = (filepath) => {
-  return new Promise((resolve, rejects) => {
+  new Promise((resolve, rejects) => {
     logPageLoader('Создаем директорию для загрузки файлов');
     const dirrectory = path.parse(filepath).dir;
     const nameForDirrectory = path.parse(filepath).name.concat('_files');
@@ -54,7 +54,7 @@ const writeFile = (nameForDir, list, url) => {
   const myURL = new URL(url);
   const originURL = myURL.origin;
   const hostUrl = myURL.host;
-  return list.map((src) => {
+  list.map((src) => {
     return new Promise((resolve, reject) => {
       logPageLoader(`Приступаем к скачиванию изображения по ссылке ${src}`);
       axios({
@@ -90,12 +90,12 @@ const writeFile = (nameForDir, list, url) => {
 };
 
 const changePathsInFile = (filepath, imagePaths) => {
-  return new Promise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     fs.readFile(filepath, 'utf-8')
       .then((response) => {
         const doc = cheerio.load(response);
         doc('img').get()
-          .filter((el) => el.attribs.src.startsWith('data') ? undefined : el.attribs.src)
+          .filter((el) => (el.attribs.src.startsWith('data') ? undefined : el.attribs.src))
           .filter((el) => el !== undefined)
           .map((image) => {
             const before = doc(image).attr('src');
@@ -112,7 +112,7 @@ const changePathsInFile = (filepath, imagePaths) => {
 };
 
 const downloaderImages = (url, filepath) => {
-  return new Promise((resolve, rejects) => {
+  new Promise((resolve, rejects) => {
     createDirectory(filepath)
       .then((nameForDir) => {
         filtredImageList(filepath)

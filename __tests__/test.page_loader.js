@@ -52,8 +52,8 @@ test('check downloader_images', async () => {
   await downloaderImages('https://ru.hexlet.io/courses', fp);
   const actual = await readFile(fp, 'utf-8');
   await expect(actual).toEqual(shared.changedFixture);
-  await expect(access(`${shared.path}/ru-hexlet-io-courses_files`, constants.R_OK | constants.W_OK)).toBeDefined();
-  await expect(access(`${shared.path}/ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png`, constants.R_OK | constants.W_OK)).toBeDefined();
+  await expect(access(`${shared.path}/ru-hexlet-io-courses_files`, constants.R_OK || constants.W_OK)).toBeDefined();
+  await expect(access(`${shared.path}/ru-hexlet-io-courses_files/ru-hexlet-io-assets-professions-nodejs.png`, constants.R_OK || constants.W_OK)).toBeDefined();
 });
 
 test('check downloader_files', async () => {
@@ -78,5 +78,5 @@ test('downloader_page fails with an error', async () => {
     .get('/courses1')
     .replyWithError('something went wrong');
 
-    await expect(downloaderPage('https://ru.hexlet.io/courses1', shared.path)).rejects.toThrow();
+  await expect(downloaderPage('https://ru.hexlet.io/courses1', shared.path)).rejects.toThrow();
 });

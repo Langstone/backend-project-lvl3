@@ -29,15 +29,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
             .map((el) => el.attribs.href)
             .filter((el) => el !== undefined)
             .map((el) => el.startsWith('/') ? `${originURL}${el}` : el)
-            .map((el) => {
-              const elURl = new URL(el);
-              if (elURl.host === hostURL) {
-                return el;
-              } else {
-                return undefined;
-              }
-            })
-            .filter((el) => el !== undefined);
+            .filter((el) => new URL(el).host === hostURL)
           resolve(linkList);
         }
         if (tag === 'script') {
@@ -45,21 +37,13 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
           linkList = doc('script').get()
             .map((el) => el.attribs.src)
             .filter((el) => el !== undefined)
-            .map((el) => el.startsWith('/') ? `${originURL}${el}` : el)
-            .map((el) => {
-              const elURl = new URL(el);
-              if (elURl.host === hostURL) {
-                return el;
-              } else {
-                return undefined;
-              }
-            })
-            .filter((el) => el !== undefined);
+            .map((el) => (el.startsWith('/') ? `${originURL}${el}` : el))
+            .filter((el) => new URL(el).host === hostURL)
           resolve(linkList);
         }
       })
-      .catch(err => reject(err));
-  })
+      .catch((err) => reject(err));
+  });
 };
 
 const writeFile = (nameForDir, pathsList, url) => {
@@ -69,7 +53,7 @@ const writeFile = (nameForDir, pathsList, url) => {
   return list.map((src) => {
     const srcURL = new URL(src);
     const pathnameSrcURL = srcURL.pathname;
-    const directoryNameFromSrcURL = (el) => path.parse(el).dir === '/' ? path.parse(el).dir : `${path.parse(el).dir}/`;
+    const directoryNameFromSrcURL = (el) => (path.parse(el).dir === '/' ? path.parse(el).dir : `${path.parse(el).dir}/`);
     const nameFromSrcURL = path.parse(pathnameSrcURL).name;
     return new Promise((resolve, reject) => {
       logPageLoader(`Приступаем к скачиванию файла ${src}`);
@@ -79,10 +63,10 @@ const writeFile = (nameForDir, pathsList, url) => {
       })
         .then((answerFiles) => {
           logPageLoader(`Получен ответ от ${src}`);
-          const form = (htmlPath) => path.parse(htmlPath).ext === '' ? '.html' : path.parse(htmlPath).ext;
+          const form = (htmlPath) => (path.parse(htmlPath).ext === '' ? '.html' : path.parse(htmlPath).ext);
           const format = form(src);
           const nameForFileWithoutProtocolAndExt = `${hostUrl}${directoryNameFromSrcURL(pathnameSrcURL)}${nameFromSrcURL}`;
-          const fullSrc = (fp) => path.parse(fp).ext === '' ? `${fp}.html` : fp;
+          const fullSrc = (fp) => (path.parse(fp).ext === '' ? `${fp}.html` : fp);
           const nameForFileWithoutProtocol = nameForFileWithoutProtocolAndExt.split('');
           const nameForNewFile = nameForFileWithoutProtocol
             .map((element) => changeElement(element))
@@ -128,9 +112,9 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
           logPageLoader('Заходим в блок изменения ссылок с тегом "link"');
           doc('link').get()
             .filter((el) => el.attribs.href !== undefined)
-            .filter((el) => el.attribs.href.startsWith('/') ? el.attribs.href = `${originURL}${el.attribs.href}` : el)
+            .filter((el) => (el.attribs.href.startsWith('/') ? el.attribs.href = `${originURL}${el.attribs.href}` : el))
             .filter((el) => new URL(el.attribs.href).host === hostURL)
-            .filter((el) => path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : el.attribs.href)
+            .filter((el) => (path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : el.attribs.href))
             .map((link) => {
               const before = doc(link).attr('href');
               const found = filesPaths.find((ip) => ip.before === before);
@@ -145,12 +129,12 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
             });
         }
         if (tag === 'script') {
-          logPageLoader(`Заходим в блок изменения ссылок с тегом 'script'`);
+          logPageLoader('Заходим в блок изменения ссылок с тегом "script"');
           doc('script').get()
             .filter((el) => el.attribs.src !== undefined)
-            .filter((el) => el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el.attribs.src = el.attribs.src)
+            .filter((el) => (el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el.attribs.src))
             .filter((el) => new URL(el.attribs.src).host === hostURL)
-            .filter((el) => path.parse(el.attribs.src).ext === '' ? el.attribs.src = `${el.attribs.src}.html` : `${el.attribs.src}`)
+            .filter((el) => (path.parse(el.attribs.src).ext === '' ? el.attribs.src = `${el.attribs.src}.html` : `${el.attribs.src}`))
             .map((link) => {
               const before = doc(link).attr('src');
               const found = filesPaths.find((ip) => ip.before === before);
@@ -170,7 +154,7 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
 };
 
 const downloaderFiles = (filepath, nameForDirectory, url) => {
-  return new Promise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     filtredFilesListFromLink(url, filepath, 'link')
       .then((linkList) => {
         const requestPromises = writeFile(nameForDirectory, linkList, url);
