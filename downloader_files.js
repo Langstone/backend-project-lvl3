@@ -113,17 +113,19 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
           doc('link').get()
             .filter((el) => el.attribs.href !== undefined)
             .filter((el) => {
-              if (el.attribs.href.startsWith('/')) {
-                el.attribs.href = `${originURL}${el.attribs.href}`;
-                return el.attribs.href;
+              const e = el;
+              if (e.attribs.href.startsWith('/')) {
+                e.attribs.href = `${originURL}${e.attribs.href}`;
+                return e.attribs.href;
               }
               return el;
             })
             .filter((el) => new URL(el.attribs.href).host === hostURL)
             .filter((el) => {
-              if (path.parse(el.attribs.href).ext === '' ) {
-                el.attribs.href = `${el.attribs.href}.html`;
-                return el.attribs.href;
+              const e = el;
+              if (path.parse(e.attribs.href).ext === '' ) {
+                e.attribs.href = `${e.attribs.href}.html`;
+                return e.attribs.href;
               }
               return el.attribs.href;
             })
@@ -145,17 +147,19 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
           doc('script').get()
             .filter((el) => el.attribs.src !== undefined)
             .filter((el) => {
-              if (el.attribs.src.startsWith('/')) {
-                el.attribs.src = `${originURL}${el.attribs.src}`;
-                return el.attribs.src;
+              const e = el;
+              if (e.attribs.src.startsWith('/')) {
+                e.attribs.src = `${originURL}${e.attribs.src}`;
+                return e.attribs.src;
               }
               return el.attribs.src;
             })
             .filter((el) => new URL(el.attribs.src).host === hostURL)
             .filter((el) => {
-              if (path.parse(el.attribs.src).ext === '') {
-                el.attribs.src = `${el.attribs.src}.html`;
-                return el.attribs.src;
+              const e = el;
+              if (path.parse(e.attribs.src).ext === '') {
+                e.attribs.src = `${e.attribs.src}.html`;
+                return e.attribs.src;
               }
               return el.attribs.src;
             })
