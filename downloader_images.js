@@ -111,7 +111,7 @@ const changePathsInFile = (filepath, imagePaths) => {
   });
 };
 
-const downloaderImages = (url, filepath) => {
+const downloaderImages = (url, filepath) => 
   new Promise((resolve, rejects) => {
     createDirectory(filepath)
       .then((nameForDir) => {
@@ -127,6 +127,5 @@ const downloaderImages = (url, filepath) => {
           });
       });
   });
-};
 
 export default downloaderImages;
