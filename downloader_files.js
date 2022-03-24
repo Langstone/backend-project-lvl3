@@ -153,8 +153,8 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
   });
 };
 
-const downloaderFiles = (filepath, nameForDirectory, url) => 
-  new Promise((resolve, reject) => {
+const downloaderFiles = (filepath, nameForDirectory, url) => {
+  return new Promise((resolve, reject) => {
     filtredFilesListFromLink(url, filepath, 'link')
       .then((linkList) => {
         const requestPromises = writeFile(nameForDirectory, linkList, url);
@@ -170,5 +170,5 @@ const downloaderFiles = (filepath, nameForDirectory, url) =>
       .then(() => resolve())
       .catch((err) => reject(err));
   });
-
+};
 export default downloaderFiles;

@@ -12,8 +12,8 @@ function renameFile(element) {
 
 const logPageLoader = debug('page-loader');
 
-const downloaderPage = (htmlPath, currentDir = process.cwd()) => 
-  new Promise((resolve, reject) => {
+const downloaderPage = (htmlPath, currentDir = process.cwd()) => {
+  return new Promise((resolve, reject) => {
     if (currentDir === '/sys' && '/system') {
       reject(new Error(`${currentDir} is system directory`));
     }
@@ -47,5 +47,6 @@ const downloaderPage = (htmlPath, currentDir = process.cwd()) =>
         reject(err);
       });
   });
+};
 
 export default downloaderPage;
