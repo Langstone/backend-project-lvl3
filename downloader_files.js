@@ -28,8 +28,8 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
           linkList = doc('link').get()
             .map((el) => el.attribs.href)
             .filter((el) => el !== undefined)
-            .map((el) => el.startsWith('/') ? `${originURL}${el}` : el)
-            .filter((el) => new URL(el).host === hostURL)
+            .map((el) => (el.startsWith('/') ? `${originURL}${el}` : el))
+            .filter((el) => new URL(el).host === hostURL);
           resolve(linkList);
         }
         if (tag === 'script') {
@@ -38,7 +38,7 @@ const filtredFilesListFromLink = (url, filepath, tag) => {
             .map((el) => el.attribs.src)
             .filter((el) => el !== undefined)
             .map((el) => (el.startsWith('/') ? `${originURL}${el}` : el))
-            .filter((el) => new URL(el).host === hostURL)
+            .filter((el) => new URL(el).host === hostURL);
           resolve(linkList);
         }
       })
@@ -112,9 +112,21 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
           logPageLoader('Заходим в блок изменения ссылок с тегом "link"');
           doc('link').get()
             .filter((el) => el.attribs.href !== undefined)
-            .filter((el) => (el.attribs.href.startsWith('/') ? el.attribs.href = `${originURL}${el.attribs.href}` : el))
+            .filter((el) => {
+              if (el.attribs.href.startsWith('/')) {
+                el.attribs.href = `${originURL}${el.attribs.href}`;
+                return el.attribs.href;
+              }
+              return el;
+            })
             .filter((el) => new URL(el.attribs.href).host === hostURL)
-            .filter((el) => (path.parse(el.attribs.href).ext === '' ? el.attribs.href = `${el.attribs.href}.html` : el.attribs.href))
+            .filter((el) => {
+              if (path.parse(el.attribs.href).ext === '' ) {
+                el.attribs.href = `${el.attribs.href}.html`;
+                return el.attribs.href;
+              }
+              return el.attribs.href;
+            })
             .map((link) => {
               const before = doc(link).attr('href');
               const found = filesPaths.find((ip) => ip.before === before);
@@ -132,9 +144,21 @@ const changePathsInFileFromLink = (filepath, filesPaths, url, tag) => {
           logPageLoader('Заходим в блок изменения ссылок с тегом "script"');
           doc('script').get()
             .filter((el) => el.attribs.src !== undefined)
-            .filter((el) => (el.attribs.src.startsWith('/') ? el.attribs.src = `${originURL}${el.attribs.src}` : el.attribs.src))
+            .filter((el) => {
+              if (el.attribs.src.startsWith('/')) {
+                el.attribs.src = `${originURL}${el.attribs.src}`;
+                return el.attribs.src;
+              }
+              return el.attribs.src;
+            })
             .filter((el) => new URL(el.attribs.src).host === hostURL)
-            .filter((el) => (path.parse(el.attribs.src).ext === '' ? el.attribs.src = `${el.attribs.src}.html` : `${el.attribs.src}`))
+            .filter((el) => {
+              if (path.parse(el.attribs.src).ext === '') {
+                el.attribs.src = `${el.attribs.src}.html`;
+                return el.attribs.src;
+              }
+              return el.attribs.src;
+            })
             .map((link) => {
               const before = doc(link).attr('src');
               const found = filesPaths.find((ip) => ip.before === before);

@@ -19,16 +19,22 @@ command
       {
         title: 'Загрузка страницы',
         task: (ctx) => downloaderPage(ctx.url, ctx.output)
-          .then((path) => (ctx.path = path)),
+          .then((path) => {
+            ctx.path = path;
+            return ctx.path;
+          }),
       },
       {
         title: 'Загрузка изображений',
         task: (ctx) => downloaderImages(ctx.url, ctx.path)
-          .then((nameForDirectory) => (ctx.nameForDirectory = nameForDirectory)),
+          .then((nameForDirectory) => {
+            ctx.nameForDirectory = nameForDirectory;
+            return ctx.nameForDirectory;
+          }),
       },
       {
         title: 'Загрузка остальных ресурсов',
-        task: (ctx) => downloaderFiles(ctx.path, ctx.nameForDirectory, ctx.url)
+        task: (ctx) => downloaderFiles(ctx.path, ctx.nameForDirectory, ctx.url),
       },
     ], {
       renderer: 'verbose',
